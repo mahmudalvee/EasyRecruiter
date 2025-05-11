@@ -10,6 +10,8 @@ using System.Text.RegularExpressions;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.Content;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
+using OpenAI.Chat;
 
 namespace eRecruitment.Controllers
 {
@@ -63,6 +65,9 @@ namespace eRecruitment.Controllers
 
                 string extractedText = ExtractTextFromPdf(fileBytes);
 
+                string resultJson = await ParseCVUsingOpenAIAsync(text);
+
+
                 //string name = ExtractName(extractedText);
                 string name = ExtractNameFromFile(file.FileName);
                 string email = ExtractEmail(extractedText);
@@ -106,6 +111,43 @@ namespace eRecruitment.Controllers
                 return StatusCode(500, new { message = "Error processing CV", error = ex.Message });
             }
         }
+
+        private async Task<string> ParseCVUsingOpenAIAsync(string cvText)
+        {
+            var apiKey = "your_openai_api_key"; // Replace with your real key
+
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+
+            var request = new
+            {
+                model = "gpt-3.5-turbo",
+                messages = new[]
+                {
+            new { role = "system", content = "You are a helpful assistant that extracts information from resumes." },
+            new { role = "user", content = $"Extract Full Name, Email, Phone, Skills, Education, and Work Experience from this CV:\n\n{cvText}" }
+        }
+            };
+
+            var json = System.Text.Json.JsonSerializer.Serialize(request);
+            var response = await client.PostAsync("https://api.openai.com/v1/chat/completions",
+                new StringContent(json, Encoding.UTF8, "application/json"));
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"OpenAI API error: {response.StatusCode} - {error}");
+            }
+
+            var result = await response.Content.ReadAsStringAsync();
+            var jsonDoc = System.Text.Json.JsonDocument.Parse(result);
+            return jsonDoc.RootElement
+                          .GetProperty("choices")[0]
+                          .GetProperty("message")
+                          .GetProperty("content")
+                          .GetString();
+        }
+
 
         private string ExtractTextFromPdf(byte[] pdfBytes)
         {
