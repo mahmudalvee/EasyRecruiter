@@ -4,4 +4,5 @@
 bin/
 obj/
 *.log
-.json
+.json 
+"appsettings.json" 
