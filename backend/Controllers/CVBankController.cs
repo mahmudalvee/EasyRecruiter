@@ -1,32 +1,37 @@
-using Microsoft.AspNetCore.Mvc;
-using eRecruitment.Data;
-using eRecruitment.Models;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using eRecruitment.Data;
 using UglyToad.PdfPig;
-using UglyToad.PdfPig.Content;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
-using OpenAI.Chat;
+using eRecruitment.Models;
+using System.Text.RegularExpressions;              // or whatever PDF library you use
 
-namespace eRecruitment.Controllers
+[ApiController]
+[Route("api/[controller]")]
+public class CVBankController : ControllerBase
 {
-    [Route("api/cvbank")]
-    [ApiController]
-    public class CVBankController : ControllerBase
+    private readonly ApplicationDbContext _context;
+    private readonly IConfiguration _config;
+    private readonly HttpClient _httpClient;
+
+    public CVBankController(
+        ApplicationDbContext context,
+        IConfiguration config,
+        IHttpClientFactory httpFactory)
     {
-        private readonly ApplicationDbContext _context;
+        _context = context;
+        _config = config;
+        _httpClient = httpFactory.CreateClient();
+    }
 
-        public CVBankController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        [HttpGet("{requisitionID}")]
+    [HttpGet("{requisitionID}")]
         public IActionResult GetCVsByRequisition(int requisitionID)
         {
             try
@@ -65,7 +70,7 @@ namespace eRecruitment.Controllers
 
                 string extractedText = ExtractTextFromPdf(fileBytes);
 
-                string resultJson = await ParseCVUsingOpenAIAsync(text);
+                string resultJson = await ParseCVUsingOpenAIAsync(extractedText);
 
 
                 //string name = ExtractName(extractedText);
@@ -114,7 +119,7 @@ namespace eRecruitment.Controllers
 
         private async Task<string> ParseCVUsingOpenAIAsync(string cvText)
         {
-            var apiKey = "your_openai_api_key"; // Replace with your real key
+            var apiKey = "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"; // Replace with your real key
 
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
@@ -142,10 +147,10 @@ namespace eRecruitment.Controllers
             var result = await response.Content.ReadAsStringAsync();
             var jsonDoc = System.Text.Json.JsonDocument.Parse(result);
             return jsonDoc.RootElement
-                          .GetProperty("choices")[0]
-                          .GetProperty("message")
-                          .GetProperty("content")
-                          .GetString();
+                  .GetProperty("choices")[0]
+                  .GetProperty("message")
+                  .GetProperty("content")
+                  .GetString();
         }
 
 
@@ -239,5 +244,4 @@ namespace eRecruitment.Controllers
 
 
 
-    }
 }
