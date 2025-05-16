@@ -117,44 +117,47 @@ public class CVBankController : ControllerBase
             }
         }
 
-        private async Task<string> ParseCVUsingOpenAIAsync(string cvText)
+    private async Task<string> ParseCVUsingOpenAIAsync(string cvText)
+    {
+        var apiKey = _config["OpenAI:ApiKey"];
+        var model = _config["OpenAI:Model"];   // "gpt-4o-mini"
+
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+
+        var request = new
         {
-            var apiKey = "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"; // Replace with your real key
-
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
-
-            var request = new
+            model = model,
+            messages = new[]
             {
-                model = "gpt-3.5-turbo",
-                messages = new[]
-                {
-            new { role = "system", content = "You are a helpful assistant that extracts information from resumes." },
-            new { role = "user", content = $"Extract Full Name, Email, Phone, Skills, Education, and Work Experience from this CV:\n\n{cvText}" }
+            new { role = "system", content = "You are a helpful assistant that extracts structured information from CVs." },
+            new { role = "user", content = $"Extract the following from this CV:\n- Full Name\n- Email\n- Phone\n- Skills\n- Education\n- Work Experience\n\nCV Text:\n{cvText}" }
         }
-            };
+        };
 
-            var json = System.Text.Json.JsonSerializer.Serialize(request);
-            var response = await client.PostAsync("https://api.openai.com/v1/chat/completions",
-                new StringContent(json, Encoding.UTF8, "application/json"));
+        var json = System.Text.Json.JsonSerializer.Serialize(request);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                throw new Exception($"OpenAI API error: {response.StatusCode} - {error}");
-            }
+        var response = await client.PostAsync("https://api.openai.com/v1/chat/completions",
+            new StringContent(json, Encoding.UTF8, "application/json"));
 
-            var result = await response.Content.ReadAsStringAsync();
-            var jsonDoc = System.Text.Json.JsonDocument.Parse(result);
-            return jsonDoc.RootElement
-                  .GetProperty("choices")[0]
-                  .GetProperty("message")
-                  .GetProperty("content")
-                  .GetString();
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception($"OpenAI API error: {response.StatusCode} - {error}");
         }
 
+        var result = await response.Content.ReadAsStringAsync();
+        var jsonDoc = System.Text.Json.JsonDocument.Parse(result);
+        return jsonDoc.RootElement
+            .GetProperty("choices")[0]
+            .GetProperty("message")
+            .GetProperty("content")
+            .GetString();
+    }
 
-        private string ExtractTextFromPdf(byte[] pdfBytes)
+
+    private string ExtractTextFromPdf(byte[] pdfBytes)
         {
             using (var ms = new MemoryStream(pdfBytes))
             using (var pdfDocument = PdfDocument.Open(ms))
