@@ -6,3 +6,4 @@ obj/
 *.log
 .json 
 "appsettings.json" 
+backend/appsettings.json 
