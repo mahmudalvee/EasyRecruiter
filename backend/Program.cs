@@ -1,6 +1,7 @@
 using Microsoft.OpenApi.Models; 
 using Microsoft.EntityFrameworkCore;
 using eRecruitment.Data;
+using eRecruitment.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();

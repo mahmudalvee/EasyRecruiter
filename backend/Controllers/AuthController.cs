@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using eRecruitment.Data;
 using eRecruitment.Models;
 using System.Linq;
+using eRecruitment.Service;
 
 namespace eRecruitment.Controllers
 {
@@ -9,20 +10,20 @@ namespace eRecruitment.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IAuthService _authService;
 
-        public AuthController(ApplicationDbContext context)
+        public AuthController(IAuthService authService)
         {
-            _context = context;
+            _authService = authService;
         }
 
         [HttpPost("login")]
         public IActionResult Login([FromBody] User user)
         {
-            var dbUser = _context.Users.FirstOrDefault(u => u.UserNo == user.UserNo && u.Password == user.Password);
-            if (dbUser != null)
+            var (isValid, role) = _authService.Login(user);
+            if (isValid)
             {
-                return Ok(new { message = "Success", role = dbUser.UserNo == "Admin" ? "Admin" : "User" });
+                return Ok(new { message = "Success", role });
             }
             return Unauthorized(new { message = "Invalid credentials" });
         }
