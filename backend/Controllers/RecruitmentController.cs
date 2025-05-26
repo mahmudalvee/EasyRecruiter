@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using eRecruitment.Data;
 using eRecruitment.Models;
-using System.Linq;
-using System;
+using eRecruitment.Service;
 
 namespace eRecruitment.Controllers
 {
@@ -10,61 +8,34 @@ namespace eRecruitment.Controllers
     [ApiController]
     public class RecruitmentController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IRequisitionService _requisitionService;
 
-        public RecruitmentController(ApplicationDbContext context)
+        public RecruitmentController(IRequisitionService requisitionService)
         {
-            _context = context;
+            _requisitionService = requisitionService;
         }
 
         [HttpPost("addRecruitment")]
         public IActionResult AddRequisition([FromBody] Requisition requisition)
         {
-            try
-            {
-                if (requisition == null)
-                {
-                    return BadRequest(new { message = "Invalid requisition data" });
-                }
-
-                _context.Requisitions.Add(requisition);
-                _context.SaveChanges();
-
-                return Ok(new { message = "Requisition added successfully" });
-            }
-            catch(Exception e)
-            {
-                return BadRequest(new { message = "Error Occured" });
-            }
+            var result = _requisitionService.AddRequisition(requisition);
+            return result ? Ok(new { message = "Requisition added successfully" }) :
+                            BadRequest(new { message = "Invalid requisition data" });
         }
 
         [HttpGet("getAllRequisitions")]
         public IActionResult GetAllRequisitions()
         {
-            var requisitions = _context.Requisitions.OrderByDescending(r => r.RequisitionID).ToList();
+            var requisitions = _requisitionService.GetAllRequisitions();
             return Ok(requisitions);
         }
 
         [HttpDelete("delete/{id}")]
         public IActionResult DeleteRequisition(int id)
         {
-            try
-            {
-                var requisition = _context.Requisitions.FirstOrDefault(r => r.RequisitionID == id);
-                if (requisition == null)
-                {
-                    return NotFound(new { message = "Requisition not found" });
-                }
-
-                _context.Requisitions.Remove(requisition);
-                _context.SaveChanges();
-
-                return Ok(new { message = "Requisition deleted successfully!" });
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new { message = "Error Occured while deleting Requisition" });
-            }
+            var result = _requisitionService.DeleteRequisition(id);
+            return result ? Ok(new { message = "Requisition deleted successfully!" }) :
+                            NotFound(new { message = "Requisition not found" });
         }
     }
 }

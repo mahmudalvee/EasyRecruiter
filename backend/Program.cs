@@ -17,6 +17,7 @@ builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRequisitionService, RequisitionService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
