@@ -4,6 +4,7 @@
 bin/
 obj/
 *.log
-.json 
+.json
+.py 
 "appsettings.json" 
 backend/appsettings.json 
