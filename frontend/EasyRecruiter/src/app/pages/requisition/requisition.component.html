@@ -1,0 +1,78 @@
+<app-nav></app-nav>
+<div *ngIf="showNewBtn">
+    <button (click)="addRequisitionClicked()" class="add-button">+ Add New Requisition</button>
+</div>
+<div class="requisition-container" *ngIf="showNew">
+    <h3 for="" style="text-align: center; color: #007bff;"><u>Add New Requisition</u></h3>
+
+    <div class="input-row">
+      <div class="input-group">
+        <label for="requisitionName">Requisition Name:</label>
+        <input type="text" id="requisitionName" [(ngModel)]="requisitionName">
+      </div>
+      <div class="input-group">
+        <label for="designation">Designation:</label>
+        <input type="text" id="designation" [(ngModel)]="designation">
+      </div>
+    </div>
+  
+    <div class="input-row">
+      <div class="input-group">
+        <label for="department">Department:</label>
+        <input type="text" id="department" [(ngModel)]="department">
+      </div>
+      <div class="input-group">
+        <label for="grade">Grade:</label>
+        <input type="text" id="grade" [(ngModel)]="grade">
+      </div>
+    </div>
+  
+    <div class="input-row">
+      <div class="input-group">
+        <label for="salary">Salary:</label>
+        <input type="number" id="salary" [(ngModel)]="salary">
+      </div>
+      <div class="input-group">
+        <label for="vacancy">Vacancy:</label>
+        <input type="number" id="vacancy" [(ngModel)]="vacancyNo">
+      </div>
+    </div>
+  
+    <button (click)="addRequisition()" class="add-button">+ Add New Requisition</button>
+    <!-- <p *ngIf="successMessage" class="success">{{ successMessage }}</p>
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p> -->
+  </div>
+  
+  <div class="container" style="margin-bottom: 10%; margin-top: 3%;">
+    <h3 for="" style="text-align: center; color: #007bff;">Requisition List</h3>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>Requisition Name</th>
+          <th>Designation</th>
+          <th>Department</th>
+          <th>Grade</th>
+          <th>Salary</th>
+          <th>Vacancy</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let req of requisitions">
+          <td>{{ req.requisitionName }}</td>
+          <td>{{ req.designation }}</td>
+          <td>{{ req.department }}</td>
+          <td>{{ req.grade }}</td>
+          <td>{{ req.salary | currency }}</td>
+          <td>{{ req.vacancy }}</td>
+          <td>
+            <button class="btn btn-danger" (click)="deleteRequisition(req.requisitionID)">
+                <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+ <app-footer></app-footer>

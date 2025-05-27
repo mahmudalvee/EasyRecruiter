@@ -1,0 +1,13 @@
+.footer {
+    background-color: #007bff; /* bg-primary */
+    text-align: center;        /* Center the text */
+    height: 60px;              /* Set the height of the footer */
+    display: flex;
+    align-items: center;      /* Vertically center the content */
+    justify-content: center;  /* Horizontally center the content */
+    color: white;             /* Set text color to white */
+    position: fixed;          /* Fix the footer to the bottom */
+    left: 0;
+    bottom: 0;                /* Position the footer at the bottom */
+    width: 100%;              /* Make the footer span the entire width */
+}

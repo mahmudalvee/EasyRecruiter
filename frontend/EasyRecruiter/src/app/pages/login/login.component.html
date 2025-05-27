@@ -1,0 +1,27 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <!-- Login Form Column -->
+    <div class="col-md-6 col-sm-12">
+      <div class="card shadow-lg p-4 rounded">
+        <h2 class="text-center mb-4">Easy Recruiter: Login</h2>
+        <form (submit)="login(); $event.preventDefault()">
+          <div class="mb-3">
+            <label for="userNo" class="form-label">User No</label>
+            <input type="text" id="userNo" placeholder="User No" [(ngModel)]="userNo" name="userNo" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" placeholder="Password" [(ngModel)]="password" name="password" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Login</button>
+          <p *ngIf="error" class="error-message text-danger mt-3">{{ error }}</p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Image Column -->
+    <div class="col-md-6 col-sm-12 d-flex align-items-center justify-content-center">
+      <img style="width: 50%;" src="/hiring.png" alt="Hiring Image" class="img-fluid">
+    </div>
+  </div>
+</div>
