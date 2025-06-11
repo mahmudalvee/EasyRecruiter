@@ -26,9 +26,9 @@
 ## Future Work
 
 * **Advanced Search and Filtering:** Implement more sophisticated search and filtering options for candidates and requisitions.
-* **Automated Interview Scheduling:** Integrate calendar functionality for scheduling interviews.
+* **Automated Interview Scheduling:** Integrate calendar functionality to schedule interviews automatically.
 * **Collaboration Features:** Allow multiple recruiters to collaborate on requisitions and candidates.
-* **Reporting and Analytics:** Provide insights into the recruitment process with dashboards and reports.
+* **Reporting and Analytics:** Deliver actionable insights into the recruitment process through dashboards and reports.
 * **Integration with other HR Systems:** Explore potential integrations with other HR platforms.
 * **Enhanced AI Capabilities:** Further refine AI-powered information extraction and potentially add features like candidate scoring or matching.
 * **Mobile Responsiveness:** Ensure a seamless experience on mobile devices.
