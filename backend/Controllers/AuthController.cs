@@ -3,6 +3,7 @@ using eRecruitment.Data;
 using eRecruitment.Models;
 using System.Linq;
 using eRecruitment.Service;
+using Microsoft.AspNetCore.Identity;
 
 namespace eRecruitment.Controllers
 {

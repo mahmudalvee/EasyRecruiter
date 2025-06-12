@@ -23,8 +23,10 @@ namespace eRecruitment.Service
             var dbUser = _context.Users.FirstOrDefault(u => u.UserNo == user.UserNo && u.Password == user.Password);
             if (dbUser != null)
             {
-                var role = dbUser.UserNo == "Admin" ? "Admin" : "User";
-                return (true, role);
+                //var role = dbUser.UserNo == "Admin" ? "Admin" : "User";
+                var role = (dbUser.UserNo).ToLower() == "admin" ? "Admin" : "User";
+                if (role == "Admin") return (true, role);
+                else return (false, null);
             }
             return (false, null);
         }

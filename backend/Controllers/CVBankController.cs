@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using eRecruitment.Data;
 using UglyToad.PdfPig;
 using eRecruitment.Models;
-using System.Text.RegularExpressions;              // or whatever PDF library you use
+using System.Text.RegularExpressions;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -244,7 +244,5 @@ public class CVBankController : ControllerBase
 
             return Ok(new { message = "CV deleted successfully" });
         }
-
-
 
 }

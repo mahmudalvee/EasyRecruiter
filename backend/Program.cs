@@ -18,6 +18,7 @@ builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRequisitionService, RequisitionService>();
+builder.Services.AddTransient<ICVBankService, CVBankService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
