@@ -5,6 +5,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -46,7 +47,7 @@ export class RequisitionComponent {
     };
 
     console.log(requisitionData); // Log the data to the console
-    this.http.post<{ message: string }>('http://localhost:5000/api/requisition/addRecruitment', requisitionData)
+    this.http.post<{ message: string }>(environment.apiUrl + 'requisition/addRecruitment', requisitionData)
       .subscribe({
         next: (response) => {
           alert(`Success: ${response.message}`);
@@ -63,7 +64,7 @@ export class RequisitionComponent {
   }
 
   getRequisitions() {
-    this.http.get<any[]>('http://localhost:5000/api/requisition/getAllRequisitions')
+    this.http.get<any[]>(environment.apiUrl + 'requisition/getAllRequisitions')
       .subscribe({
         next: (data) => {
           this.requisitions = data;

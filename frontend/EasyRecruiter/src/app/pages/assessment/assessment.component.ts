@@ -5,6 +5,8 @@ import { RouterModule } from '@angular/router';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../../environments/environment';
+
 
 @Component({
   selector: 'app-assessment',
@@ -25,7 +27,7 @@ export class AssessmentComponent implements OnInit {
   }
 
   getRequisitions() {
-    this.http.get<any[]>('http://localhost:5000/api/requisition/getAllRequisitions')
+    this.http.get<any[]>(environment.apiUrl + 'requisition/getAllRequisitions')
       .subscribe({
         next: (data) => {
           this.requisitions = data;
@@ -98,7 +100,7 @@ export class AssessmentComponent implements OnInit {
     }
   
     // Update or Add
-    this.http.post('http://localhost:5000/api/assessment/addMultiple', selectedAssessments)
+    this.http.post(environment.apiUrl + 'assessment/addMultiple', selectedAssessments)
       .subscribe({
         next: () => alert("Assessments saved successfully!"),
         error: (err) => alert("Failed to save assessments."),

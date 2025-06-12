@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../../environments/environment';
+
 
 @Component({
   selector: 'app-login',
@@ -21,8 +22,8 @@ export class LoginComponent {
 
   login() {
     const loginData = { userNo: this.userNo, password: this.password };
-debugger
-    this.http.post<{ message: string, role: string }>('http://localhost:5000/api/auth/login', loginData)
+    debugger
+    this.http.post<{ message: string, role: string }>(environment.apiUrl + 'auth/login', loginData)
       .subscribe({
         next: (response) => {
           if (response.message === 'Success') {
