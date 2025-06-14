@@ -44,6 +44,43 @@ public class CVBankController : ControllerBase
         }
     }
 
+    [HttpPost("uploadCVs")]
+    public async Task<IActionResult> UploadMultipleCVs([FromForm] List<IFormFile> files, [FromForm] int requisitionID)
+    {
+        if (files == null || files.Count == 0)
+            return BadRequest(new { message = "No files uploaded" });
+
+        var uploadedResults = new List<object>();
+
+        foreach (var file in files)
+        {
+            try
+            {
+                var cv = await _cvBankService.ProcessAndSaveCVAsync(file, requisitionID);
+                uploadedResults.Add(new
+                {
+                    status = "Success",
+                    cv.Name,
+                    cv.Email,
+                    cv.Phone,
+                    cv.Education
+                });
+            }
+            catch (Exception ex)
+            {
+                uploadedResults.Add(new
+                {
+                    status = "Failed",
+                    fileName = file.FileName,
+                    error = ex.Message
+                });
+            }
+        }
+
+        return Ok(new { message = "Upload completed", results = uploadedResults });
+    }
+
+
     [HttpDelete("delete/{id}")]
     public IActionResult DeleteCV(int id)
     {

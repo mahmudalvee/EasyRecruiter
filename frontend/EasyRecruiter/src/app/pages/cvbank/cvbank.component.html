@@ -1,4 +1,8 @@
 <app-nav></app-nav>
+<div *ngIf="isLoading" class="overlay-loader">
+  <kendo-loader [type]="'infinite-spinner'" [themeColor]="'dark'" [size]="'large'"></kendo-loader>
+</div>
+
 <div *ngIf="showNewBtn" style="margin-top: 3%;">
     <h5 style="margin-left: 5%;">Select a Requisition to access CV Bank</h5>
 
@@ -33,7 +37,8 @@
       <h4>Upload CVs (PDF):</h4>
     </div>
     <div style="margin: auto;">
-      <input type="file" (change)="onFileSelected($event)" accept=".pdf" multiple>
+      <!-- <input type="file" (change)="onFileSelected($event)" accept=".pdf" multiple> -->
+       <input type="file" (change)="onFileSelectedCVs($event)" accept=".pdf" multiple>
     </div>
     <!-- <ul *ngIf="selectedCVs.length > 0">
       <li *ngFor="let file of selectedCVs">

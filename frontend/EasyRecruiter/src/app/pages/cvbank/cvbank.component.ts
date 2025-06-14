@@ -6,12 +6,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { LoaderModule } from '@progress/kendo-angular-indicators';
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NavComponent, RouterModule, FooterComponent,CommonModule, FormsModule],
+  imports: [NavComponent, RouterModule, FooterComponent,CommonModule, FormsModule, LoaderModule],
   templateUrl: './cvbank.component.html',
   styleUrl: './cvbank.component.css'
 })
@@ -31,6 +32,7 @@ export class CVBankComponent {
   selectedRequisitionID: number | null = null;
   cvs: any[] = [];
   selectedCVs: File[] = [];
+  isLoading = false;
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -116,16 +118,51 @@ export class CVBankComponent {
     });
   }
 
+  onFileSelectedCVs(event: any) {
+  this.selectedCVs = Array.from(event.target.files);
+
+  if (!this.selectedRequisitionID || this.selectedCVs.length === 0) {
+    alert("Please select a requisition and upload at least one CV.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('requisitionID', this.selectedRequisitionID.toString());
+
+  this.selectedCVs.forEach((file, index) => {
+    formData.append('files', file); // 'files' is the key for multiple
+  });
+
+  var selectedRequisitionID = this.selectedRequisitionID;
+
+  this.http.post(environment.apiUrl + 'cvbank/uploadCVs', formData)
+    .subscribe({
+      next: (response: any) => {
+        alert("CVs uploaded successfully!");
+        this.selectedCVs = [];
+        this.getCVsByRequisition(selectedRequisitionID);
+      },
+      error: (err) => {
+        alert("Failed to upload CVs. " + err.error.message);
+        console.error(err);
+        this.selectedCVs = [];
+        this.getCVsByRequisition(selectedRequisitionID);
+      }
+    });
+  }
+
   getCVsByRequisition(requisitionID: number) {
+    this.isLoading = true;
     this.http.get<any[]>(`http://localhost:5000/api/cvbank/${requisitionID}`)
       .subscribe({
         next: (data) => {
           this.cvs = data;
-          debugger
+          this.isLoading = false;
         },
         error: (err) => {
           this.cvs = []; // Clear list if no CVs found
           console.error('Error fetching CVs:', err);
+          this.isLoading = false;
         }
       });
   }
