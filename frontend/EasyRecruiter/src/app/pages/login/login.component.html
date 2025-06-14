@@ -1,3 +1,7 @@
+<div *ngIf="isLoading" class="overlay-loader">
+  <kendo-loader [type]="'infinite-spinner'" [themeColor]="'dark'" [size]="'large'"></kendo-loader>
+</div>
+
 <div class="container mt-5">
   <div class="row justify-content-center">
     <!-- Login Form Column -->

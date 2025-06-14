@@ -3286,6 +3286,13 @@ function scan(accumulator, seed) {
   return operate(scanInternals(accumulator, seed, arguments.length >= 2, true));
 }
 
+// node_modules/rxjs/dist/esm5/internal/operators/skip.js
+function skip(count2) {
+  return filter(function(_, index) {
+    return count2 <= index;
+  });
+}
+
 // node_modules/rxjs/dist/esm5/internal/operators/startWith.js
 function startWith() {
   var values = [];
@@ -27075,6 +27082,7 @@ export {
   takeLast,
   last2 as last,
   scan,
+  skip,
   startWith,
   switchMap,
   takeUntil,
@@ -27591,4 +27599,4 @@ export {
    * found in the LICENSE file at https://angular.dev/license
    *)
 */
-//# sourceMappingURL=chunk-NAMEVOEZ.js.map
+//# sourceMappingURL=chunk-MOADAK7L.js.map
