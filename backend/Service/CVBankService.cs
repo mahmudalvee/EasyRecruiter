@@ -178,8 +178,8 @@ namespace eRecruitment.Service
             //return "Not Found";
 
             //new
-            var match = Regex.Replace(Regex.Match(text, @"\*\*Education:\*\*\s*-\s*(.+?)\n", RegexOptions.Singleline).Groups[1].Value, @"\*+", "").Trim();
-            return string.IsNullOrWhiteSpace(match) ? "Not Found" : match;
+            var match = Regex.Match(text, @"\*\*Education:\*\*\s*-\s*(.+?)\n", RegexOptions.Singleline);
+            return match.Success ? match.Groups[1].Value.Trim() : "Not Found";
         }
 
         private string ExtractSkills(string text)

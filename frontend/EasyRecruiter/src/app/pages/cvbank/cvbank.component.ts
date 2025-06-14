@@ -67,12 +67,15 @@ export class CVBankComponent {
   }
 
   getRequisitions() {
+    this.isLoading = true;
     this.http.get<any[]>(environment.apiUrl + 'requisition/getAllRequisitions')
       .subscribe({
         next: (data) => {
           this.requisitions = data;
+          this.isLoading = false;
         },
         error: (err) => {
+          this.isLoading = false;
           console.error('Error fetching requisitions:', err);
         }
       });
@@ -84,39 +87,39 @@ export class CVBankComponent {
     this.getCVsByRequisition(this.selectedRequisitionID); // Fetch CVs for selected requisition
   }
 
-  
-  onFileSelected(event: any) {
-    this.selectedCVs = Array.from(event.target.files); // Store selected files
-    console.log('Selected CVs:', this.selectedCVs);
+  //single uploader
+  // onFileSelected(event: any) {
+  //   this.selectedCVs = Array.from(event.target.files); // Store selected files
+  //   console.log('Selected CVs:', this.selectedCVs);
 
-    if (!this.selectedRequisitionID|| this.selectedCVs.length === 0) {
-      alert("Please select a requisition and upload at least one CV.");
-      return;
-    }
-    var selectedRequisitionID = this.selectedRequisitionID;
+  //   if (!this.selectedRequisitionID|| this.selectedCVs.length === 0) {
+  //     alert("Please select a requisition and upload at least one CV.");
+  //     return;
+  //   }
+  //   var selectedRequisitionID = this.selectedRequisitionID;
 
-    this.selectedCVs.forEach(file => {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('requisitionID', selectedRequisitionID.toString());
+  //   this.selectedCVs.forEach(file => {
+  //     const formData = new FormData();
+  //     formData.append('file', file);
+  //     formData.append('requisitionID', selectedRequisitionID.toString());
 
-      this.http.post(environment.apiUrl + 'cvbank/upload', formData)
-        .subscribe({
-          next: (response) => {
-            alert("CV uploaded successfully!");
-            this.selectedCVs = [];
-            this.getCVsByRequisition(selectedRequisitionID);
-          },
-          error: (err) => {
-            alert("Failed to upload CV. "+err.error.message);
-            console.error(err);
-            this.selectedCVs = [];
-            this.getCVsByRequisition(selectedRequisitionID);
-          }
+  //     this.http.post(environment.apiUrl + 'cvbank/upload', formData)
+  //       .subscribe({
+  //         next: (response) => {
+  //           alert("CV uploaded successfully!");
+  //           this.selectedCVs = [];
+  //           this.getCVsByRequisition(selectedRequisitionID);
+  //         },
+  //         error: (err) => {
+  //           alert("Failed to upload CV. "+err.error.message);
+  //           console.error(err);
+  //           this.selectedCVs = [];
+  //           this.getCVsByRequisition(selectedRequisitionID);
+  //         }
           
-        });
-    });
-  }
+  //       });
+  //   });
+  // }
 
   onFileSelectedCVs(event: any) {
   this.selectedCVs = Array.from(event.target.files);
@@ -130,22 +133,24 @@ export class CVBankComponent {
   formData.append('requisitionID', this.selectedRequisitionID.toString());
 
   this.selectedCVs.forEach((file, index) => {
-    formData.append('files', file); // 'files' is the key for multiple
+    formData.append('files', file);
   });
 
   var selectedRequisitionID = this.selectedRequisitionID;
-
+  this.isLoading = true;
   this.http.post(environment.apiUrl + 'cvbank/uploadCVs', formData)
     .subscribe({
       next: (response: any) => {
         alert("CVs uploaded successfully!");
         this.selectedCVs = [];
+        this.isLoading = false;
         this.getCVsByRequisition(selectedRequisitionID);
       },
       error: (err) => {
         alert("Failed to upload CVs. " + err.error.message);
         console.error(err);
-        this.selectedCVs = [];
+        this.selectedCVs = []
+        this.isLoading = false;
         this.getCVsByRequisition(selectedRequisitionID);
       }
     });
@@ -153,7 +158,7 @@ export class CVBankComponent {
 
   getCVsByRequisition(requisitionID: number) {
     this.isLoading = true;
-    this.http.get<any[]>(`http://localhost:5000/api/cvbank/${requisitionID}`)
+    this.http.get<any[]>(`${environment.apiUrl}cvbank/${requisitionID}`)
       .subscribe({
         next: (data) => {
           this.cvs = data;
@@ -187,14 +192,17 @@ export class CVBankComponent {
 
   deleteCV(cVId: number) {
     if (confirm("Are you sure you want to delete this CV?")) {
-      this.http.delete(`http://localhost:5000/api/cvbank/delete/${cVId}`)
+      this.isLoading = true;
+      this.http.delete(`${environment.apiUrl}cvbank/delete/${cVId}`)
         .subscribe({
           next: () => {
             alert("CV deleted successfully!");
-            this.cvs = this.cvs.filter(cv => cv.cvId !== cVId); // Remove from UI
+            this.cvs = this.cvs.filter(cv => cv.cvId !== cVId);
+            this.isLoading = false;
           },
           error: (err) => {
             alert("Failed to delete CV.");
+            this.isLoading = false;
             console.error('Error deleting CV:', err);
           }
         });
