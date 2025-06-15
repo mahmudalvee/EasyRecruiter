@@ -1,4 +1,7 @@
 <app-nav></app-nav>
+<div *ngIf="isLoading" class="overlay-loader">
+  <kendo-loader [type]="'infinite-spinner'" [themeColor]="'dark'" [size]="'large'"></kendo-loader>
+</div>
 <div *ngIf="showNewBtn">
     <button (click)="addRequisitionClicked()" class="add-button">+ Add New Requisition</button>
 </div>

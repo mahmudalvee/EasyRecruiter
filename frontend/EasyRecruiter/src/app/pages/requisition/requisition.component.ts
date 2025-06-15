@@ -6,12 +6,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { LoaderModule } from '@progress/kendo-angular-indicators';
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NavComponent, RouterModule, FooterComponent,CommonModule, FormsModule],
+  imports: [NavComponent, RouterModule, FooterComponent,CommonModule, FormsModule, LoaderModule],
   templateUrl: './requisition.component.html',
   styleUrl: './requisition.component.css'
 })
@@ -28,6 +29,7 @@ export class RequisitionComponent {
   successMessage: string = '';
   errorMessage: string = '';
   requisitions: any[] = [];
+  isLoading = false;
 
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -46,46 +48,54 @@ export class RequisitionComponent {
       vacancy: this.vacancyNo.toString()
     };
 
-    console.log(requisitionData); // Log the data to the console
+    console.log(requisitionData);
+    this.isLoading = true;
     this.http.post<{ message: string }>(environment.apiUrl + 'requisition/addRecruitment', requisitionData)
       .subscribe({
         next: (response) => {
           alert(`Success: ${response.message}`);
-          this.resetForm(); // Reset form after successful submission
+          this.resetForm();
           this.getRequisitions();
         },
         error: (err) => {
           this.errorMessage = 'Failed to add requisition';
           alert(`Error: ${this.errorMessage}`);
           console.error('Error:', err);
+          this.isLoading = false;
         }
       });
 
   }
 
   getRequisitions() {
+    this.isLoading = true;
     this.http.get<any[]>(environment.apiUrl + 'requisition/getAllRequisitions')
       .subscribe({
         next: (data) => {
           this.requisitions = data;
+          this.isLoading = false;
         },
         error: (err) => {
           console.error('Error fetching requisitions:', err);
+          this.isLoading = false;
         }
       });
   }
 
   deleteRequisition(id: number) {
     if (confirm('Are you sure you want to delete this requisition? Deleting a requisition will delete corresponding CV Bank and other requisition Data permanently.')) {
-      this.http.delete<{ message: string }>(`http://localhost:5000/api/requisition/delete/${id}`)
+      this.isLoading = true;
+      this.http.delete<{ message: string }>(`${environment.apiUrl}/api/requisition/delete/${id}`)
         .subscribe({
           next: (response) => {
             alert(response.message); // Show success message
-            this.requisitions = this.requisitions.filter(req => req.requisitionID !== id); // Update UI
+            this.requisitions = this.requisitions.filter(req => req.requisitionID !== id);
+            this.isLoading = false;
           },
           error: (err) => {
             alert('Failed to delete requisition.');
             console.error('Error:', err);
+            this.isLoading = false;
           }
         });
     }

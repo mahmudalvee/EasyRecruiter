@@ -6,12 +6,13 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
+import { LoaderModule } from '@progress/kendo-angular-indicators';
 
 
 @Component({
   selector: 'app-assessment',
   standalone: true,
-  imports: [NavComponent, RouterModule, FooterComponent,CommonModule, FormsModule],
+  imports: [NavComponent, RouterModule, FooterComponent,CommonModule, FormsModule, LoaderModule],
   templateUrl: './assessment.component.html',
   styleUrl: './assessment.component.css'
 })
@@ -19,6 +20,7 @@ export class AssessmentComponent implements OnInit {
   requisitions: any[] = [];
   selectedRequisitionID: number | null = null;
   cvs: any[] = [];
+  isLoading = false;
 
   constructor(private http: HttpClient) {}
 
@@ -27,12 +29,16 @@ export class AssessmentComponent implements OnInit {
   }
 
   getRequisitions() {
+    debugger
+    this.isLoading = true;
     this.http.get<any[]>(environment.apiUrl + 'requisition/getAllRequisitions')
       .subscribe({
         next: (data) => {
           this.requisitions = data;
+          this.isLoading = false;
         },
         error: (err) => {
+          this.isLoading = false;
           console.error('Error fetching requisitions:', err);
         }
       });
@@ -44,10 +50,11 @@ export class AssessmentComponent implements OnInit {
   }
 
   getCVsByRequisition(requisitionID: number) {
-    this.http.get<any[]>(`http://localhost:5000/api/cvbank/${requisitionID}`)
+    this.isLoading = true;
+    this.http.get<any[]>(`${environment.apiUrl}cvbank/${requisitionID}`)
       .subscribe({
         next: (data) => {
-          this.http.get<any[]>(`http://localhost:5000/api/assessment/${requisitionID}`)
+          this.http.get<any[]>(`${environment.apiUrl}assessment/${requisitionID}`)
             .subscribe({
               next: (assessments) => {
                 debugger
@@ -66,9 +73,11 @@ export class AssessmentComponent implements OnInit {
                   };
                 });
                 debugger
+                this.isLoading = false;
               },
               error: (err) => {
                 console.error('Error fetching assessments:', err);
+                this.isLoading = false;
               }
             });
         },
@@ -95,22 +104,30 @@ export class AssessmentComponent implements OnInit {
       }));
   
     if (selectedAssessments.length === 0) {
-      alert("Please select at least one CV to assess.");
+      alert("Please select at least one CV to save assessment.");
       return;
     }
   
+    this.isLoading = true;
     // Update or Add
     this.http.post(environment.apiUrl + 'assessment/addMultiple', selectedAssessments)
       .subscribe({
-        next: () => alert("Assessments saved successfully!"),
-        error: (err) => alert("Failed to save assessments."),
+        next: () => {
+          debugger
+          alert("Assessments saved successfully!");
+          this.isLoading = false;
+        },
+        error: (err) => {
+          alert("Failed to save assessments.");
+          this.isLoading = false;
+        }
       });
   }
 
   deleteAssessment(assessment: any) {
     debugger
     if (confirm("Are you sure you want to delete this assessment?")) {
-      this.http.delete(`http://localhost:5000/api/assessment/delete/${assessment?.assessmentId}`)
+      this.http.delete(`${environment.apiUrl}assessment/delete/${assessment?.assessmentId}`)
         .subscribe({
           next: () => {
             alert("Assessment deleted successfully!");

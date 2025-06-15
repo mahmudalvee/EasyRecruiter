@@ -6,12 +6,13 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
+import { LoaderModule } from '@progress/kendo-angular-indicators';
 
 
 @Component({
   selector: 'app-offer-letter',
   standalone: true,
-  imports: [NavComponent, RouterModule, FooterComponent,CommonModule, FormsModule],
+  imports: [NavComponent, RouterModule, FooterComponent,CommonModule, FormsModule, LoaderModule],
   templateUrl: './offer-letter.component.html',
   styleUrl: './offer-letter.component.css'
 })
@@ -27,6 +28,7 @@ export class OfferLetterComponent implements OnInit {
   department: string = '';
   salary: number = 0;
   designation: string = '';
+  isLoading = false;
 
 
   ngOnInit() {
@@ -34,13 +36,16 @@ export class OfferLetterComponent implements OnInit {
   }
 
   getRequisitions() {
+    this.isLoading = true;
     this.http.get<any[]>(environment.apiUrl + 'requisition/getAllRequisitions')
       .subscribe({
         next: (data) => {
           this.requisitions = data;
+          this.isLoading = false;
         },
         error: (err) => {
           console.error('Error fetching requisitions:', err);
+          this.isLoading = false;
         }
       });
   }
@@ -54,10 +59,11 @@ export class OfferLetterComponent implements OnInit {
   }
 
   getCVsByRequisition(requisitionID: number) {
-    this.http.get<any[]>(`http://localhost:5000/api/cvbank/${requisitionID}`)
+    this.isLoading = true;
+    this.http.get<any[]>(`${environment.apiUrl}/api/cvbank/${requisitionID}`)
       .subscribe({
         next: (data) => {
-          this.http.get<any[]>(`http://localhost:5000/api/assessment/${requisitionID}`)
+          this.http.get<any[]>(`${environment.apiUrl}/api/assessment/${requisitionID}`)
             .subscribe({
               next: (assessments) => {
                 this.cvs = data.map(cv => {
@@ -89,13 +95,14 @@ export class OfferLetterComponent implements OnInit {
                 console.error('Error fetching assessments:', err);
               }
             });
+            this.isLoading = false;
         },
         error: (err) => {
           this.cvs = [];
           console.error('Error fetching CVs:', err);
+          this.isLoading = false;
         }
       });
-      debugger
   }  
 
   saveAssessments() {
@@ -113,7 +120,7 @@ export class OfferLetterComponent implements OnInit {
       }));
   
     if (selectedAssessments.length === 0) {
-      alert("Please select at least one CV to assess.");
+      alert("Please select at least one Candidate to save assessment.");
       return;
     }
   
@@ -128,7 +135,7 @@ export class OfferLetterComponent implements OnInit {
   deleteAssessment(assessment: any) {
     debugger
     if (confirm("Are you sure you want to delete this assessment?")) {
-      this.http.delete(`http://localhost:5000/api/assessment/delete/${assessment?.assessmentId}`)
+      this.http.delete(`${environment.apiUrl}/api/assessment/delete/${assessment?.assessmentId}`)
         .subscribe({
           next: () => {
             alert("Assessment deleted successfully!");
@@ -165,17 +172,20 @@ export class OfferLetterComponent implements OnInit {
       }))
     };
 
+    this.isLoading = true;
     this.http.post(environment.apiUrl + 'offer/send', offerData)
       .subscribe({
         next: () => {
-          alert('Offer letters sent successfully!');
-          this.router.navigate(['/dashboard']);  
+          alert('Offer letter sent successfully! Candidates should check their email.');
+          this.isLoading = false;
+          //this.router.navigate(['/dashboard']);  
         },
         error: (err) => {
           //alert('Failed to send offer letters.');
           alert('Offer letters sent successfully!');
           console.error('Error sending offer letter:', err);
-          this.router.navigate(['/dashboard']); 
+          this.isLoading = false;
+          //this.router.navigate(['/dashboard']); 
         }
       });
   }
