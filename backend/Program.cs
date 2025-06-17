@@ -5,7 +5,6 @@ using eRecruitment.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Enable CORS for frontend communication
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -19,6 +18,8 @@ builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRequisitionService, RequisitionService>();
 builder.Services.AddTransient<ICVBankService, CVBankService>();
+builder.Services.AddScoped<IOfferService, OfferService>();
+builder.Services.AddScoped<IAssessmentService, AssessmentService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();

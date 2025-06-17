@@ -2,6 +2,7 @@
 using eRecruitment.Data;
 using eRecruitment.Models;
 using System.Linq;
+using eRecruitment.Service;
 
 namespace eRecruitment.Controllers
 {
@@ -10,84 +11,60 @@ namespace eRecruitment.Controllers
     public class AssessmentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IAssessmentService _assessmentService;
 
-        public AssessmentController(ApplicationDbContext context)
+        public AssessmentController(ApplicationDbContext context, IAssessmentService assessmentService)
         {
             _context = context;
+            _assessmentService = assessmentService;
         }
 
         [HttpGet("{requisitionID}")]
         public IActionResult GetAssessments(int requisitionID)
         {
-            var assessments = _context.Assessments.Where(a => a.RequisitionID == requisitionID).ToList();
-
-
+            List<Assessment> assessments = new List<Assessment>();
+            try
+            {
+                assessments = _assessmentService.Get(requisitionID);
+            }
+            catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
             return Ok(assessments);
         }
 
         [HttpPost("add")]
-        public IActionResult AddAssessment([FromBody] Assessment assessment)
+        public async Task<IActionResult> AddAssessment([FromBody] Assessment assessment)
         {
-            if (assessment == null)
-            {
-                return BadRequest(new { message = "Invalid data" });
-            }
+            var message = await _assessmentService.Add(assessment);
 
-            assessment.TotalMarks = assessment.WrittenMarks + assessment.VivaMarks + assessment.OtherMarks; // Auto-calculate Total
+            if (message == "Invalid data")
+                return BadRequest(new { message });
 
-            _context.Assessments.Add(assessment);
-            _context.SaveChanges();
-
-            return Ok(new { message = "Assessment added successfully", assessment });
+            return Ok(new { message, assessment });
         }
 
         [HttpPost("addMultiple")]
-        public IActionResult AddMultipleAssessments([FromBody] List<Assessment> assessments)
+        public async Task<IActionResult> AddMultipleAssessments([FromBody] List<Assessment> assessments)
         {
-            if (assessments == null || !assessments.Any())
-            {
-                return BadRequest(new { message = "No assessments provided" });
-            }
+            var message = await _assessmentService.AddMultiple(assessments);
 
-            foreach (var assessment in assessments)
-            {
-                var existingAssessment = _context.Assessments
-                    .FirstOrDefault(a => a.CVId == assessment.CVId && a.RequisitionID == assessment.RequisitionID);
+            if (message == "No assessments provided")
+                return BadRequest(new { message });
 
-                if (existingAssessment != null)
-                {
-                    // Update existing assessment
-                    existingAssessment.WrittenMarks = assessment.WrittenMarks;
-                    existingAssessment.VivaMarks = assessment.VivaMarks;
-                    existingAssessment.OtherMarks = assessment.OtherMarks;
-                    existingAssessment.TotalMarks = assessment.WrittenMarks + assessment.VivaMarks + assessment.OtherMarks;
-                    existingAssessment.Comment = assessment.Comment;
-                    existingAssessment.IsSelected = assessment.IsSelected;
-                }
-                else
-                {
-                    // Add new assessment
-                    _context.Assessments.Add(assessment);
-                }
-            }
-
-            _context.SaveChanges();
-            return Ok(new { message = "Assessments added/updated successfully" });
+            return Ok(new { message });
         }
 
         [HttpDelete("delete/{id}")]
-        public IActionResult DeleteAssessment(int id)
+        public async Task<IActionResult> DeleteAssessment(int id)
         {
-            var assessment = _context.Assessments.FirstOrDefault(a => a.AssessmentId == id);
-            if (assessment == null)
-            {
-                return NotFound(new { message = "Assessment not found" });
-            }
+            var message = await _assessmentService.Delete(id);
 
-            _context.Assessments.Remove(assessment);
-            _context.SaveChanges();
+            if (message == "Assessment not found")
+                return NotFound(new { message });
 
-            return Ok(new { message = "Assessment deleted successfully" });
+            return Ok(new { message });
         }
 
     }
