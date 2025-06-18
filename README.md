@@ -1,7 +1,9 @@
 # Easy Recruiter
 
-## Features
+## Project Demonstration
+https://drive.google.com/drive/folders/1-g6mUjV3EL-HHX3BPnt2Uq0SAoMzMxWU
 
+## Features
 * **Admin Login:** Secure access for recruiters.
 * **Requisition Management:** Creation of new job openings.
 * **Candidate CV Upload:** Uploading CVs in PDF format.
@@ -14,7 +16,6 @@
 * **MySQL Database:** For data storage.
 
 ## Technologies Used
-
 * **.NET 9**
 * **EF Core**
 * **Angular 18**
@@ -22,6 +23,7 @@
 * **UglyToad.PdfPig**
 * **REST API**
 * **MySQL**
+* **Design Patterns**
 
 ## Future Work
 
