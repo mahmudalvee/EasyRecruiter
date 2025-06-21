@@ -54,7 +54,7 @@ namespace eRecruitment.Service
             }
 
             string extractedText = ExtractTextFromPdf(fileBytes);
-            string resultJson = await ParseCVUsingOpenAIAsync(extractedText);
+            string resultJson = await OpenAICVParse(extractedText, requisitionID);
 
             string name = ExtractNameFromFile(file.FileName);
             string email = ExtractEmail(resultJson);
@@ -63,6 +63,7 @@ namespace eRecruitment.Service
             string skill = ExtractSkills(resultJson);
             string experience = ExtractExperience(resultJson);
             string gender = ExtractGender(resultJson);
+            string matchDescriptionSkill = ExtractMatch(resultJson);
 
             var existCvName = _context.CVs.Any(cv => cv.RequisitionID == requisitionID && cv.Name == name);
             var existCvEmail = _context.CVs.Any(cv => cv.RequisitionID == requisitionID && cv.Email == email);
@@ -81,6 +82,7 @@ namespace eRecruitment.Service
                 Skill = skill,
                 Experience = experience,
                 Gender = gender,
+                MatchDescriptionSkill = matchDescriptionSkill,
                 Cv = fileBytes
             };
 
@@ -90,8 +92,17 @@ namespace eRecruitment.Service
             return newCV;
         }
 
-        private async Task<string> ParseCVUsingOpenAIAsync(string cvText)
+        private async Task<string> OpenAICVParse(string cvText, int requisitionID)
         {
+            string? requisitionDescriptionSkill = string.Empty;
+            string promptRequisitionDescriptionSkill = string.Empty;
+            var requisition = _context.Requisitions.FirstOrDefault(r => r.RequisitionID == requisitionID);
+            if (requisition != null)
+                requisitionDescriptionSkill = requisition.DescriptionSkill?.ToString();
+
+            if (requisitionDescriptionSkill != null)
+                promptRequisitionDescriptionSkill = "Match (Just the match in %, not anything else) for the CV According to the description: " +requisitionDescriptionSkill;
+
             var apiKey = _config["OpenAI:ApiKey"];
             var model = _config["OpenAI:Model"];
 
@@ -104,7 +115,7 @@ namespace eRecruitment.Service
                 messages = new[]
                 {
                 new { role = "system", content = "You are a helpful assistant that extracts structured information from CVs." },
-                new { role = "user", content = $"Extract the following from this CV:\n- Full Name\n- Email\n- Phone\n- Gender\n- Skills\n- Education\n- Work Experience\n- Years of Work Experience\n\nCV Text:\n{cvText}" }
+                new { role = "user", content = $"CV Text:\n{cvText}\n\nExtract the following from this CV:\n- Full Name\n- Email\n- Phone\n- Gender\n- Skills(only the major ones)\n- Education(Latest degree) \n- Work Experience as today is {DateTime.Today}, (only the company name, year)\n- Years of Work Experience\n- {promptRequisitionDescriptionSkill}\n" }
             }
             };
 
@@ -163,58 +174,50 @@ namespace eRecruitment.Service
             return phoneMatch.Success ? phoneMatch.Value : "Not Found";
         }
 
-        private string ExtractEducation(string text)
+        public static string ExtractEducation(string cvText)
         {
-            //text = text.ToLower();
-            //string[] degrees = { "doctorate", "phd", "msc", "mba", "master", "bachelor", "bba", "bsc", "diploma", "ssc", "hsc"};
-            //foreach (var degree in degrees)
-            //{
-            //    if (text.Contains(degree))
-            //    {
-            //        var degreeUpper = degree.ToUpper();
-            //        return degreeUpper;
-            //    }
-            //}
-            //return "Not Found";
-
-            //new
-            var match = Regex.Match(text, @"\*\*Education:\*\*\s*-\s*(.+?)\n", RegexOptions.Singleline);
-            return match.Success ? match.Groups[1].Value.Trim() : "Not Found";
-        }
-
-        private string ExtractSkills(string text)
-        {
-            var match = Regex.Match(text, @"\*\*Skills:\*\*\s*(.+?)\s*- \*\*Education:\*\*", RegexOptions.Singleline);
+            Match match = Regex.Match(cvText, @"- \*\*Education \(Latest degree\):\*\*\s*(.*?)(?=\n- \*\*|\z)", RegexOptions.Singleline);
             if (match.Success)
             {
-                string skillsBlock = match.Groups[1].Value;
-
-                skillsBlock = Regex.Replace(skillsBlock, @"\*+", "");
-                skillsBlock = Regex.Replace(skillsBlock, @"[A-Za-z\s]+?:", "");
-
-                var skills = skillsBlock.Split(',')
-                                        .Select(skill => skill.Trim())
-                                        .Where(skill => !string.IsNullOrWhiteSpace(skill));
-
-                return string.Join(", ", skills);
+                return match.Groups[1].Value.Trim();
             }
+            return "Not Found";
+        }
 
+        public static string ExtractSkills(string cvText)
+        {
+            Match match = Regex.Match(cvText, @"- \*\*Skills:\*\*\s*(.*?)(?=\n- |\z)", RegexOptions.Singleline);
+            if (match.Success)
+            {
+                return match.Groups[1].Value.Trim();
+            }
             return "Not Found";
         }
         private string ExtractExperience(string text)
         {
-            //text = text.ToLower();
-            //var match = Regex.Match(text, @"(?i)(?:experience|work wxperience|working experience|professional experience)[:\s-]+([\s\S]+?)(?:\n\n|\n[A-Z])");
-            var match = Regex.Match(text, @"\*\*Years of Work Experience:\*\*\s*(.*?)\Z", RegexOptions.Singleline);
-
-            return match.Success ? match.Groups[1].Value.Trim() : "Not Found";
+            Match match = Regex.Match(text, @"- \*\*Years of Work Experience:\*\*\s*(.*?)(?=\n- |\z)", RegexOptions.Singleline);
+            if (match.Success)
+            {
+                return match.Groups[1].Value.Trim();
+            }
+            return "Not Found";
         }
 
         private string ExtractGender(string text)
         {
-            var match = Regex.Match(text, @"\*\*Gender:\*\*\s*(Male|Female)", RegexOptions.IgnoreCase);
+            var match = Regex.Match(text, @"- \*\*Gender:\*\*\s*(Male|Female)", RegexOptions.IgnoreCase);
             return match.Success ? match.Groups[1].Value : "Not Found";
         }
+
+        private string ExtractMatch(string text)
+        {
+            //text = text.ToLower();
+            //var match = Regex.Match(text, @"(?i)(?:experience|work wxperience|working experience|professional experience)[:\s-]+([\s\S]+?)(?:\n\n|\n[A-Z])");
+            var match = System.Text.RegularExpressions.Regex.Match(text, @"- \*\*Match:\*\*\s*(\d+%)");
+
+            return match.Success ? match.Groups[1].Value.Trim() : "Not Found";
+        }
+
         #endregion
     }
 }

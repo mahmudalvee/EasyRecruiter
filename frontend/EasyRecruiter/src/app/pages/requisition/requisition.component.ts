@@ -26,6 +26,7 @@ export class RequisitionComponent {
   salary: number = 0;
   vacancyNo: number = 0;
   vacancy: string = '';
+  descriptionSkill: string = '';
   successMessage: string = '';
   errorMessage: string = '';
   requisitions: any[] = [];
@@ -45,7 +46,8 @@ export class RequisitionComponent {
       department: this.department,
       grade: this.grade,
       salary: this.salary,
-      vacancy: this.vacancyNo.toString()
+      vacancy: this.vacancyNo.toString(),
+      descriptionSkill: this.descriptionSkill.toString()
     };
 
     console.log(requisitionData);
@@ -85,7 +87,7 @@ export class RequisitionComponent {
   deleteRequisition(id: number) {
     if (confirm('Are you sure you want to delete this requisition? Deleting a requisition will delete corresponding CV Bank and other requisition Data permanently.')) {
       this.isLoading = true;
-      this.http.delete<{ message: string }>(`${environment.apiUrl}/api/requisition/delete/${id}`)
+      this.http.delete<{ message: string }>(`${environment.apiUrl}requisition/delete/${id}`)
         .subscribe({
           next: (response) => {
             alert(response.message); // Show success message
@@ -116,5 +118,6 @@ export class RequisitionComponent {
     this.salary = 0;
     this.vacancyNo = 0;
     this.vacancy = '';
+    this.descriptionSkill = '';
   }
 }

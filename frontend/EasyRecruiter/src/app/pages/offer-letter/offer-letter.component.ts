@@ -60,12 +60,15 @@ export class OfferLetterComponent implements OnInit {
 
   getCVsByRequisition(requisitionID: number) {
     this.isLoading = true;
-    this.http.get<any[]>(`${environment.apiUrl}/api/cvbank/${requisitionID}`)
+    debugger
+    this.http.get<any[]>(`${environment.apiUrl}cvbank/${requisitionID}`)
       .subscribe({
         next: (data) => {
-          this.http.get<any[]>(`${environment.apiUrl}/api/assessment/${requisitionID}`)
+          debugger
+          this.http.get<any[]>(`${environment.apiUrl}assessment/${requisitionID}`)
             .subscribe({
               next: (assessments) => {
+                debugger
                 this.cvs = data.map(cv => {
                   const assessment = assessments.find(a => a.cvId === cv.cvId && a.requisitionID === cv.requisitionID);
                   
@@ -135,7 +138,7 @@ export class OfferLetterComponent implements OnInit {
   deleteAssessment(assessment: any) {
     debugger
     if (confirm("Are you sure you want to delete this assessment?")) {
-      this.http.delete(`${environment.apiUrl}/api/assessment/delete/${assessment?.assessmentId}`)
+      this.http.delete(`${environment.apiUrl}assessment/delete/${assessment?.assessmentId}`)
         .subscribe({
           next: () => {
             alert("Assessment deleted successfully!");

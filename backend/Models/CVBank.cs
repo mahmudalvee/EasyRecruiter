@@ -17,6 +17,7 @@ namespace eRecruitment.Models
         public string? Skill { get; set; }
         public string? Experience { get; set; }
         public string? Gender { get; set; }
+        public string? MatchDescriptionSkill { get; set; }
         public byte[]? Cv { get; set; }
     }
 }

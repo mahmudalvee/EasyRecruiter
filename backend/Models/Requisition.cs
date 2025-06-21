@@ -26,5 +26,7 @@ namespace eRecruitment.Models
 
         [Required]
         public string Vacancy { get; set; }
+
+        public string? DescriptionSkill { get; set; }
     }
 }

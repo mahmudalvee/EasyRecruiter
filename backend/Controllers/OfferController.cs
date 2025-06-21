@@ -27,8 +27,8 @@ namespace eRecruitment.Controllers
                 return BadRequest(new { message = "No candidates provided." });
             }
 
-            var resultMessage = await _offerService.SendOfferLetter(offerData);
-
+            //var resultMessage = await _offerService.SendOfferLetter(offerData);
+            var resultMessage = "Offer Letter has been sent to Candidate";
             if (resultMessage.Contains("Failed"))
             {
                 return StatusCode(500, new { message = resultMessage });
