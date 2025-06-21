@@ -9,8 +9,8 @@ https://drive.google.com/drive/folders/1-g6mUjV3EL-HHX3BPnt2Uq0SAoMzMxWU
 * **Candidate CV Upload:** Uploading CVs in PDF format.
 * **Intelligent CV Parsing:** Extraction of text using **UglyToad.PdfPig**.
 * **AI-Powered Information Extraction:** Utilizing the **OpenAI API** :
-    **To assign a score to matching candidates based on job descriptions**
-    **Extracting core candidate details: name, education, skills, experiences, etc.**
+     *To assign a score to matching candidates based on job descriptions*
+     *Extracting core candidate details: name, education, skills, experiences, etc.*
 * **Assessment Module:** Creation and assignment of candidate assessments.
 * **Offer Letter Generation:** Creation of offer letters with customizable details (salary, joining date).
 
