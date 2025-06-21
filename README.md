@@ -8,12 +8,9 @@ https://drive.google.com/drive/folders/1-g6mUjV3EL-HHX3BPnt2Uq0SAoMzMxWU
 * **Requisition Management:** Creation of new job openings.
 * **Candidate CV Upload:** Uploading CVs in PDF format.
 * **Intelligent CV Parsing:** Extraction of text using **UglyToad.PdfPig**.
-* **AI-Powered Information Extraction:** Utilizing the **OpenAI API** to extract candidate details (name, education, skills, etc.).
+* **AI-Powered Information Extraction:** Utilizing the **OpenAI API** to assign a score to matching candidates based on job descriptions, extracting core candidate details: name, education, skills, experiences, etc.
 * **Assessment Module:** Creation and assignment of candidate assessments.
 * **Offer Letter Generation:** Creation of offer letters with customizable details (salary, joining date).
-* **Email Integration:** Sending offer letters via SMTP.
-* **REST API:** Backend API for frontend communication.
-* **MySQL Database:** For data storage.
 
 ## Technologies Used
 * **.NET 9**
