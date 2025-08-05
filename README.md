@@ -4,11 +4,11 @@
 https://drive.google.com/drive/folders/1-g6mUjV3EL-HHX3BPnt2Uq0SAoMzMxWU
 
 ## Features
-* **Admin Login:** Secure access for recruiters.
+* **Admin Login:** Secure access for recruiter.
 * **Requisition Management:** Creation of new job openings.
 * **Candidate CV Upload:** Uploading CVs in PDF format.
 * **Intelligent CV Parsing:** Extraction of text using **UglyToad.PdfPig**.
-* **AI-Powered Information Extraction:** Utilizing the **OpenAI API** & send a request prompt to:
+* **AI-Powered Candidate Scanning:** Utilizing the **OpenAI API** & send a request prompt to:
   * Assign a score to matching candidates based on job descriptions
   * Extract the core candidate details: name, education, skills, experiences, etc.
 * **Assessment Module:** Creation and assignment of candidate assessments.
