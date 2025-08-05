@@ -7,4 +7,5 @@ obj/
 .json
 .py 
 "appsettings.json" 
-backend/appsettings.json 
+backend/appsettings.json
+frontend/cache
