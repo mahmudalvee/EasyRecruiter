@@ -1,12 +1,15 @@
-﻿using eRecruitment.Data;
+﻿using backend.Helper;
+using eRecruitment.Data;
 using eRecruitment.Models;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 
 namespace eRecruitment.Service
 {
     public interface IAuthService
     {
         (bool isValid, string role) Login(User user);
+        //string? LoginJWT(User user);
     }
 
     public class AuthService : IAuthService
@@ -30,5 +33,16 @@ namespace eRecruitment.Service
             }
             return (false, null);
         }
+
+        //public string? LoginJWT(User user)
+        //{
+        //    var dbUser = _context.Users.FirstOrDefault(u => u.UserNo == user.UserNo && u.Password == user.Password);
+        //    if (dbUser != null)
+        //    {
+        //        return JwtTokenGenerator.GenerateToken(dbUser.UserNo, _config);
+        //    }
+
+        //    return null;
+        //}
     }
 }

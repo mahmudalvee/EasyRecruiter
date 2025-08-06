@@ -27,6 +27,13 @@ namespace eRecruitment.Controllers
                 return Ok(new { message = "Success", role });
             }
             return Unauthorized(new { message = "Invalid credentials" });
+
+            //var token = _authService.LoginJWT(user);
+
+            //if (token == null)
+            //    return Unauthorized(new { message = "Invalid credentials" });
+
+            //return Ok(new { token });
         }
     }
 }
