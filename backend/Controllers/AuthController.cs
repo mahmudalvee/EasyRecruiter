@@ -18,22 +18,27 @@ namespace eRecruitment.Controllers
             _authService = authService;
         }
 
+        //[HttpPost("login")]
+        //public IActionResult Login([FromBody] User user)
+        //{
+        //    var (isValid, role) = _authService.Login(user);
+        //    if (isValid)
+        //    {
+        //        return Ok(new { message = "Success", role });
+        //    }
+        //    return Unauthorized(new { message = "Invalid credentials" });
+        //}
+
         [HttpPost("login")]
         public IActionResult Login([FromBody] User user)
         {
             var (isValid, role) = _authService.Login(user);
             if (isValid)
             {
-                return Ok(new { message = "Success", role });
+                var token = _authService.LoginJWT(user);
+                return Ok(new { message = "Success", role, token });
             }
             return Unauthorized(new { message = "Invalid credentials" });
-
-            //var token = _authService.LoginJWT(user);
-
-            //if (token == null)
-            //    return Unauthorized(new { message = "Invalid credentials" });
-
-            //return Ok(new { token });
         }
     }
 }

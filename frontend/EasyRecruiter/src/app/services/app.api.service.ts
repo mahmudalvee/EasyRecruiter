@@ -1,5 +1,3 @@
-// src/app/services/api.service.ts
-
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -12,10 +10,12 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   get<T>(endpoint: string): Observable<T> {
+    debugger
     return this.http.get<T>(this.baseUrl + endpoint);
   }
 
   post<T>(endpoint: string, data: any): Observable<T> {
+    debugger
     return this.http.post<T>(this.baseUrl + endpoint, data);
   }
 

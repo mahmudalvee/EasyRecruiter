@@ -30,9 +30,10 @@ export class LoginComponent {
     this.apiService.post<{ message: string, role: string, token?: string }>('auth/login', loginData)
       .subscribe({
         next: (res) => {
+          debugger
           this.isLoading = false;
           if (res.message === 'Success') {
-            localStorage.setItem('token', res['token'] ?? '');  // token save
+            localStorage.setItem('token', res['token'] ?? '');
             this.router.navigate(['/dashboard']);
           }
         },

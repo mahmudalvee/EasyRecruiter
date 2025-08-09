@@ -9,16 +9,20 @@ namespace eRecruitment.Service
     public interface IAuthService
     {
         (bool isValid, string role) Login(User user);
-        //string? LoginJWT(User user);
+        string? LoginJWT(User user);
+        string? Authenticate(string username, string password);
+
     }
 
     public class AuthService : IAuthService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _config;
 
-        public AuthService(ApplicationDbContext context)
+        public AuthService(ApplicationDbContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;
         }
 
         public (bool isValid, string role) Login(User user)
@@ -34,15 +38,25 @@ namespace eRecruitment.Service
             return (false, null);
         }
 
-        //public string? LoginJWT(User user)
-        //{
-        //    var dbUser = _context.Users.FirstOrDefault(u => u.UserNo == user.UserNo && u.Password == user.Password);
-        //    if (dbUser != null)
-        //    {
-        //        return JwtTokenGenerator.GenerateToken(dbUser.UserNo, _config);
-        //    }
+        public string? LoginJWT(User user)
+        {
+            var dbUser = _context.Users.FirstOrDefault(u => u.UserNo == user.UserNo && u.Password == user.Password);
+            if (dbUser != null)
+            {
+                return JwtTokenGenerator.GenerateToken(dbUser.UserNo, _config);
+            }
 
-        //    return null;
-        //}
+            return null;
+        }
+
+        public string? Authenticate(string username, string password)
+        {
+            if (username == "admin" && password == "1234")
+            {
+                return JwtTokenGenerator.GenerateToken(username, _config);
+            }
+
+            return null;
+        }
     }
 }
