@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { LoaderModule } from '@progress/kendo-angular-indicators';
+import { ApiService } from '../../services/app.api.service';
 
 
 @Component({
@@ -34,41 +35,15 @@ export class CVBankComponent {
   selectedCVs: File[] = [];
   isLoading = false;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private apiService: ApiService, private router: Router) {}
 
   ngOnInit() {
     this.getRequisitions();
   }
 
-  addRequisition() {
-    const requisitionData = {
-      requisitionName: this.requisitionName,
-      designation: this.designation,
-      department: this.department,
-      grade: this.grade,
-      salary: this.salary,
-      vacancy: this.vacancyNo.toString()
-    };
-
-    console.log(requisitionData); // Log the data to the console
-    this.http.post<{ message: string }>(environment.apiUrl + 'requisition/addRecruitment', requisitionData)
-      .subscribe({
-        next: (response) => {
-          alert(`Success: ${response.message}`);
-          this.getRequisitions();
-        },
-        error: (err) => {
-          this.errorMessage = 'Failed to add requisition';
-          alert(`Error: ${this.errorMessage}`);
-          console.error('Error:', err);
-        }
-      });
-
-  }
-
   getRequisitions() {
     this.isLoading = true;
-    this.http.get<any[]>(environment.apiUrl + 'requisition/getAllRequisitions')
+    this.apiService.get<any[]>('requisition/getAllRequisitions')
       .subscribe({
         next: (data) => {
           this.requisitions = data;
@@ -138,7 +113,7 @@ export class CVBankComponent {
 
   var selectedRequisitionID = this.selectedRequisitionID;
   this.isLoading = true;
-  this.http.post(environment.apiUrl + 'cvbank/uploadCVs', formData)
+  this.apiService.post<{ message: string }>('cvbank/uploadCVs', formData)
     .subscribe({
       next: (response: any) => {
         alert("CVs uploaded successfully!");
@@ -158,7 +133,7 @@ export class CVBankComponent {
 
   getCVsByRequisition(requisitionID: number) {
     this.isLoading = true;
-    this.http.get<any[]>(`${environment.apiUrl}cvbank/${requisitionID}`)
+    this.apiService.get<any[]>(`cvbank/${requisitionID}`)
       .subscribe({
         next: (data) => {
           this.cvs = data;
@@ -193,7 +168,7 @@ export class CVBankComponent {
   deleteCV(cVId: number) {
     if (confirm("Are you sure you want to delete this CV?")) {
       this.isLoading = true;
-      this.http.delete(`${environment.apiUrl}cvbank/delete/${cVId}`)
+      this.apiService.delete<{ message: string }>(`${environment.apiUrl}cvbank/delete/${cVId}`)
         .subscribe({
           next: () => {
             alert("CV deleted successfully!");
