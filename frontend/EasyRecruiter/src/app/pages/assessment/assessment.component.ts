@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { LoaderModule } from '@progress/kendo-angular-indicators';
+import { ApiService } from '../../services/app.api.service';
 
 
 @Component({
@@ -22,7 +23,7 @@ export class AssessmentComponent implements OnInit {
   cvs: any[] = [];
   isLoading = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
   ngOnInit() {
     this.getRequisitions();
@@ -31,7 +32,7 @@ export class AssessmentComponent implements OnInit {
   getRequisitions() {
     debugger
     this.isLoading = true;
-    this.http.get<any[]>(environment.apiUrl + 'requisition/getAllRequisitions')
+    this.apiService.get<any[]>('requisition/getAllRequisitions')
       .subscribe({
         next: (data) => {
           this.requisitions = data;
@@ -51,10 +52,10 @@ export class AssessmentComponent implements OnInit {
 
   getCVsByRequisition(requisitionID: number) {
     this.isLoading = true;
-    this.http.get<any[]>(`${environment.apiUrl}cvbank/${requisitionID}`)
+    this.apiService.get<any[]>(`cvbank/${requisitionID}`)
       .subscribe({
         next: (data) => {
-          this.http.get<any[]>(`${environment.apiUrl}assessment/${requisitionID}`)
+          this.apiService.get<any[]>(`assessment/${requisitionID}`)
             .subscribe({
               next: (assessments) => {
                 debugger
@@ -109,8 +110,7 @@ export class AssessmentComponent implements OnInit {
     }
   
     this.isLoading = true;
-    // Update or Add
-    this.http.post(environment.apiUrl + 'assessment/addMultiple', selectedAssessments)
+    this.apiService.post<{ message: string }>('assessment/addMultiple', selectedAssessments)
       .subscribe({
         next: () => {
           debugger
@@ -127,7 +127,7 @@ export class AssessmentComponent implements OnInit {
   deleteAssessment(assessment: any) {
     debugger
     if (confirm("Are you sure you want to delete this assessment?")) {
-      this.http.delete(`${environment.apiUrl}assessment/delete/${assessment?.assessmentId}`)
+      this.apiService.delete<{ message: string }>(`assessment/delete/${assessment?.assessmentId}`)
         .subscribe({
           next: () => {
             alert("Assessment deleted successfully!");
