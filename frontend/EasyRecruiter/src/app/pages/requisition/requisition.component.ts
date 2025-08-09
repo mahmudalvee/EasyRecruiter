@@ -4,9 +4,9 @@ import { Router, RouterModule } from '@angular/router';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { LoaderModule } from '@progress/kendo-angular-indicators';
+import { ApiService } from '../../services/app.api.service';
 
 
 @Component({
@@ -33,7 +33,7 @@ export class RequisitionComponent {
   isLoading = false;
 
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private router: Router, private apiService: ApiService) {}
 
   ngOnInit() {
     this.getRequisitions();
@@ -52,7 +52,7 @@ export class RequisitionComponent {
 
     console.log(requisitionData);
     this.isLoading = true;
-    this.http.post<{ message: string }>(environment.apiUrl + 'requisition/addRecruitment', requisitionData)
+    this.apiService.post<{ message: string }>('requisition/addRecruitment', requisitionData)
       .subscribe({
         next: (response) => {
           alert(`Success: ${response.message}`);
@@ -71,7 +71,7 @@ export class RequisitionComponent {
 
   getRequisitions() {
     this.isLoading = true;
-    this.http.get<any[]>(environment.apiUrl + 'requisition/getAllRequisitions')
+    this.apiService.get<any[]>('requisition/getAllRequisitions')
       .subscribe({
         next: (data) => {
           this.requisitions = data;
@@ -87,7 +87,7 @@ export class RequisitionComponent {
   deleteRequisition(id: number) {
     if (confirm('Are you sure you want to delete this requisition? Deleting a requisition will delete corresponding CV Bank and other requisition Data permanently.')) {
       this.isLoading = true;
-      this.http.delete<{ message: string }>(`${environment.apiUrl}requisition/delete/${id}`)
+      this.apiService.delete<{ message: string }>(`requisition/delete/${id}`)
         .subscribe({
           next: (response) => {
             alert(response.message); // Show success message
