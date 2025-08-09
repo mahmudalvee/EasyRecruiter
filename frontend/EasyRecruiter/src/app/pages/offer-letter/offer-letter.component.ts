@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { LoaderModule } from '@progress/kendo-angular-indicators';
+import { ApiService } from '../../services/app.api.service';
 
 
 @Component({
@@ -17,7 +18,7 @@ import { LoaderModule } from '@progress/kendo-angular-indicators';
   styleUrl: './offer-letter.component.css'
 })
 export class OfferLetterComponent implements OnInit {
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private apiService: ApiService, private router: Router) {}
 
   requisitions: any[] = [];
   selectedRequisitionID: number | null = null;
@@ -37,7 +38,7 @@ export class OfferLetterComponent implements OnInit {
 
   getRequisitions() {
     this.isLoading = true;
-    this.http.get<any[]>(environment.apiUrl + 'requisition/getAllRequisitions')
+    this.apiService.get<any[]>('requisition/getAllRequisitions')
       .subscribe({
         next: (data) => {
           this.requisitions = data;
@@ -61,11 +62,11 @@ export class OfferLetterComponent implements OnInit {
   getCVsByRequisition(requisitionID: number) {
     this.isLoading = true;
     debugger
-    this.http.get<any[]>(`${environment.apiUrl}cvbank/${requisitionID}`)
+    this.apiService.get<any[]>(`cvbank/${requisitionID}`)
       .subscribe({
         next: (data) => {
           debugger
-          this.http.get<any[]>(`${environment.apiUrl}assessment/${requisitionID}`)
+          this.apiService.get<any[]>(`assessment/${requisitionID}`)
             .subscribe({
               next: (assessments) => {
                 debugger
@@ -108,49 +109,6 @@ export class OfferLetterComponent implements OnInit {
       });
   }  
 
-  saveAssessments() {
-    const selectedAssessments = this.cvs
-      .filter(cv => cv.isSelected) // Only selected CVs
-      .map(cv => ({
-        cvId: cv.cvId,
-        RequisitionID: this.selectedRequisitionID,
-        WrittenMarks: cv.writtenMarks,
-        VivaMarks: cv.vivaMarks,
-        OtherMarks: cv.otherMarks,
-        TotalMarks: cv.writtenMarks + cv.vivaMarks + cv.otherMarks,
-        Comment: cv.comment,
-        IsSelected: cv.isSelectedForNextRound
-      }));
-  
-    if (selectedAssessments.length === 0) {
-      alert("Please select at least one Candidate to save assessment.");
-      return;
-    }
-  
-    // Update or Add
-    this.http.post(environment.apiUrl + 'assessment/addMultiple', selectedAssessments)
-      .subscribe({
-        next: () => alert("Assessments saved successfully!"),
-        error: (err) => alert("Failed to save assessments."),
-      });
-  }
-
-  deleteAssessment(assessment: any) {
-    debugger
-    if (confirm("Are you sure you want to delete this assessment?")) {
-      this.http.delete(`${environment.apiUrl}assessment/delete/${assessment?.assessmentId}`)
-        .subscribe({
-          next: () => {
-            alert("Assessment deleted successfully!");
-            this.cvs = this.cvs.filter(cv => cv.assessmentId !== assessment?.assessmentId);
-          },
-          error: (err) => {
-            alert("Failed to delete assessment.");
-            console.error('Error deleting assessment:', err);
-          }
-        });
-    }
-  }
 
    updateSelectedCandidates() {
     this.selectedCandidates = this.cvs.filter(cv => cv.isSelected);
@@ -176,7 +134,7 @@ export class OfferLetterComponent implements OnInit {
     };
 
     this.isLoading = true;
-    this.http.post(environment.apiUrl + 'offer/send', offerData)
+    this.apiService.post<{ message: string }>('offer/send', offerData)
       .subscribe({
         next: () => {
           alert('Offer letter sent successfully! Candidates should check their email.');
