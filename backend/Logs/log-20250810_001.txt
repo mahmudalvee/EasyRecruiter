@@ -1,0 +1,20 @@
+2025-08-10 21:26:32.783 +06:00 [INF] Incoming Request: OPTIONS /api/auth/login
+2025-08-10 21:26:35.958 +06:00 [INF] Outgoing Response: 204 for OPTIONS /api/auth/login in 3177 ms
+2025-08-10 21:26:36.007 +06:00 [INF] Incoming Request: POST /api/auth/login
+2025-08-10 21:26:50.280 +06:00 [INF] Outgoing Response: 401 for POST /api/auth/login in 14273 ms
+2025-08-10 21:29:44.125 +06:00 [INF] Incoming Request: OPTIONS /api/auth/login
+2025-08-10 21:29:46.080 +06:00 [INF] Outgoing Response: 204 for OPTIONS /api/auth/login in 1954 ms
+2025-08-10 21:29:46.110 +06:00 [INF] Incoming Request: POST /api/auth/login
+2025-08-10 21:29:50.007 +06:00 [INF] Outgoing Response: 200 for POST /api/auth/login in 3896 ms
+2025-08-10 21:29:54.852 +06:00 [INF] Incoming Request: OPTIONS /api/requisition/getAllRequisitions
+2025-08-10 21:29:56.351 +06:00 [INF] Outgoing Response: 204 for OPTIONS /api/requisition/getAllRequisitions in 1499 ms
+2025-08-10 21:29:56.364 +06:00 [INF] Incoming Request: GET /api/requisition/getAllRequisitions
+2025-08-10 21:29:57.758 +06:00 [INF] Outgoing Response: 200 for GET /api/requisition/getAllRequisitions in 1394 ms
+2025-08-10 21:30:14.324 +06:00 [INF] Incoming Request: OPTIONS /api/requisition/getAllRequisitions
+2025-08-10 21:30:16.062 +06:00 [INF] Outgoing Response: 204 for OPTIONS /api/requisition/getAllRequisitions in 1737 ms
+2025-08-10 21:30:16.077 +06:00 [INF] Incoming Request: GET /api/requisition/getAllRequisitions
+2025-08-10 21:30:18.328 +06:00 [INF] Outgoing Response: 200 for GET /api/requisition/getAllRequisitions in 2250 ms
+2025-08-10 21:30:21.515 +06:00 [INF] Incoming Request: OPTIONS /api/cvbank/12
+2025-08-10 21:30:22.782 +06:00 [INF] Outgoing Response: 204 for OPTIONS /api/cvbank/12 in 1266 ms
+2025-08-10 21:30:22.798 +06:00 [INF] Incoming Request: GET /api/cvbank/12
+2025-08-10 21:30:24.086 +06:00 [INF] Outgoing Response: 200 for GET /api/cvbank/12 in 1287 ms
